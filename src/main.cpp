@@ -14,8 +14,6 @@
 #include "Esp.h"
 #include "board_def.h"
 
-#define FILESYSTEM SPIFFS
-
 void displayInit(void);
 void drawBitmap(const char *filename, int16_t x, int16_t y, bool with_color);
 
@@ -91,7 +89,7 @@ void drawBitmap(const char *filename, int16_t x, int16_t y, bool with_color)
     Serial.print(filename);
     Serial.println('\'');
 
-    file = FILESYSTEM.open(filename, FILE_READ);
+    file = SPIFFS.open(filename, FILE_READ);
     if (!file) {
         Serial.print("File not found");
         return;
@@ -101,6 +99,7 @@ void drawBitmap(const char *filename, int16_t x, int16_t y, bool with_color)
     if (read16(file) == 0x4D42) {
         // BMP signature
         uint32_t fileSize = read32(file);
+        uint32_t creatorBytes = read32(file);
         uint32_t imageOffset = read32(file); // Start of image data
         uint32_t headerSize = read32(file);
         uint32_t width = read32(file);
@@ -108,6 +107,8 @@ void drawBitmap(const char *filename, int16_t x, int16_t y, bool with_color)
         uint16_t planes = read16(file);
         uint16_t depth = read16(file); // bits per pixel
         uint32_t format = read32(file);
+        Serial.print("format: ");
+        Serial.println(format);
         if ((planes == 1) && ((format == 0) || (format == 3))) {
             // uncompressed is handled, 565 also
             Serial.print("File size: ");
@@ -248,12 +249,11 @@ void drawBitmap(const char *filename, int16_t x, int16_t y, bool with_color)
 
 void displayInit(void)
 {
-    SPI.begin(SPI_CLK, SPI_MISO, SPI_MOSI, -1);// => io
-
     static bool isInit = false;
     if (isInit) {
         return;
     }
+    SPI.begin(SPI_CLK, SPI_MISO, SPI_MOSI, -1);
     isInit = true;
     display.init();
     display.setRotation(1);
@@ -262,7 +262,7 @@ void displayInit(void)
     display.setFont(&FreeSans9pt7b);
     display.setTextSize(0);
 
-    
+
     if (SDCARD_SS > 0) {
         display.fillScreen(GxEPD_WHITE);
         SPIClass sdSPI(VSPI);
@@ -281,8 +281,8 @@ void setup()
     Serial.begin(115200);
     delay(500);
 
-    if (!FILESYSTEM.begin()) {
-        Serial.println("FILESYSTEM is not database");
+    if (!SPIFFS.begin()) {
+        Serial.println("SPIFFS is not database");
         Serial.println("Please use Arduino ESP32 Sketch data Upload files");
         while (1) {
             delay(1000);
@@ -292,11 +292,10 @@ void setup()
     if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_UNDEFINED) {
         displayInit();
         display.fillScreen(GxEPD_WHITE);
-        drawBitmap("/esp_home.bmp", 10, 10, true);
-        displayText(String("Hello world"), 30, RIGHT_ALIGNMENT);
+        drawBitmap("/esp_home.bmp", 0, 50, true);
+        displayText(String("Hello world"), 0, RIGHT_ALIGNMENT);
         display.update();
     }
-
 }
 
 void loop()
