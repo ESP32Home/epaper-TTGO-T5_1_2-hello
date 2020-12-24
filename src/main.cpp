@@ -7,8 +7,7 @@
 #include <Fonts/FreeSans9pt7b.h>
 
 #include <Wire.h>
-#include "SD.h"
-#include "SPI.h"
+#include <SPI.h>
 #include <SPIFFS.h>
 #include <FS.h>
 #include "Esp.h"
@@ -261,19 +260,6 @@ void displayInit(void)
     display.setTextColor(GxEPD_BLACK);
     display.setFont(&FreeSans9pt7b);
     display.setTextSize(0);
-
-
-    if (SDCARD_SS > 0) {
-        display.fillScreen(GxEPD_WHITE);
-        SPIClass sdSPI(VSPI);
-        sdSPI.begin(SDCARD_CLK, SDCARD_MISO, SDCARD_MOSI, SDCARD_SS);
-        if (!SD.begin(SDCARD_SS, sdSPI))
-        {
-            Serial.println("SDCard MOUNT Failed");
-        }
-        display.update();
-        delay(2000);
-    }
 }
 
 void setup()
