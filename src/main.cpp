@@ -293,7 +293,7 @@ void setup()
         displayInit();
         display.fillScreen(GxEPD_WHITE);
         drawBitmap("/esp_home.bmp", 0, 50, true);
-        displayText(String("Hello world"), 0, RIGHT_ALIGNMENT);
+        displayText(String("Hello world"), 20, RIGHT_ALIGNMENT);
         display.update();
     }
 }
