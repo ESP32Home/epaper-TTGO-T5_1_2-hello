@@ -16,8 +16,8 @@ void setup()
 
     if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_UNDEFINED) {
         epaper.display.fillScreen(GxEPD_WHITE);
-        epaper.drawBitmap("/esp_home.bmp", 0, 50, true);
-        epaper.displayText("Hello simple", 20, EPaper::RIGHT_ALIGNMENT);
+        epaper.drawBitmap("/esp_home.bmp", 0, 0, true);
+        epaper.displayText("Hello simple", 64, EPaper::RIGHT_ALIGNMENT);
         epaper.display.update();
     }
 }
